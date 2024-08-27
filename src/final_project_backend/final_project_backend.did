@@ -1,0 +1,52 @@
+// Candid dosyasının başı
+type Principal = text;
+
+// Tekliflerin durumunu belirtir
+variant Choice = 
+  Approve
+| Reject
+| Pass;
+
+// Hata türleri
+variant VoteError = 
+  AlreadyVoted
+| ProposalIsNotActive
+| InvalidChoice
+| NoSuchProposal
+| AccessRejected
+| UpdateError;
+
+// Teklif verilerini tutar
+type Proposal = record {
+  description: text;
+  approve: nat32;
+  reject: nat32;
+  pass: nat32;
+  is_active: bool;
+  voted: vec Principal;
+  owner: Principal;
+};
+
+// Teklif oluşturma verilerini tutar
+type CreateProposal = record {
+  description: text;
+  is_active: bool;
+};
+
+// Sözleşme üzerinde tanımlı olan fonksiyonlar
+service : {
+  // Teklif almak için
+  get_proposal : (nat64) -> async opt Proposal;
+  
+  // Toplam teklif sayısını almak için
+  get_proposal_count : () -> async nat64;
+  
+  // Teklif oluşturmak için
+  create_proposal : (nat64, CreateProposal) -> async opt Proposal;
+  
+  // Teklif düzenlemek için
+  edit_proposal : (nat64, CreateProposal) -> async Result<null, VoteError>;
+  
+  // Teklif sonlandırmak için
+  end_proposal : (nat64, CreateProposal) -> async Result<null, VoteError>;
+};
